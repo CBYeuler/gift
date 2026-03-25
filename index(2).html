@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>seni düşünüyorum</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a12;
+      --pink: #ff6b9d;
+      --pink-glow: #ff6b9d88;
+      --lavender: #c084fc;
+      --cream: #fef3e8;
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--cream); font-family: 'Lora', Georgia, serif; overflow: hidden; }
+
+    .stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--d) ease-in-out infinite alternate; }
+    @keyframes twinkle { from { opacity: 0.1; transform: scale(1); } to { opacity: 0.9; transform: scale(1.4); } }
+
+    .hearts-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .pixel-heart-float { position: absolute; bottom: -60px; opacity: 0; animation: floatUp var(--dur) ease-in infinite; animation-delay: var(--delay); }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.4; }
+      100% { transform: translateY(-110vh) translateX(var(--drift)); opacity: 0; }
+    }
+
+    .page { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding: 2rem; text-align: center; transition: opacity 0.8s ease, transform 0.8s ease; }
+    .page.hidden { opacity: 0; pointer-events: none; transform: translateY(30px); }
+
+    .card-wrapper { position: relative; max-width: 680px; width: 100%; animation: cardIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) both; }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    .card { position: relative; padding: 3.5rem 3.5rem 3rem; width: 100%; }
+    .card::before, .card::after, .card .corner-bl, .card .corner-br { content: ''; position: absolute; width: 24px; height: 24px; border-color: var(--pink); border-style: solid; }
+    .card::before    { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
+    .card::after     { top: 0;    right: 0; border-width: 3px 3px 0 0; }
+    .card .corner-bl { bottom: 0; left: 0;  border-width: 0 0 3px 3px; }
+    .card .corner-br { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
+    .card .hline-top, .card .hline-bot { position: absolute; left: 28px; right: 28px; height: 1px; background: linear-gradient(90deg, transparent, var(--pink), transparent); opacity: 0.4; }
+    .card .hline-top { top: 0; }
+    .card .hline-bot { bottom: 0; }
+
+    /* Bird sits on top of the card */
+    .bird-wrap { position: absolute; top: -78px; left: 50%; transform: translateX(-50%); z-index: 30; display: flex; flex-direction: column; align-items: center; }
+    .bird-canvas { image-rendering: pixelated; image-rendering: crisp-edges; width: 90px; height: 110px; }
+    .bird-perch-line { width: 60px; height: 3px; background: linear-gradient(90deg, transparent, var(--pink) 30%, var(--pink) 70%, transparent); opacity: 0.5; }
+
+    .pixel-heart-icon { display: inline-block; margin-bottom: 2rem; animation: heartbeat 1.4s ease-in-out infinite; }
+    @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+
+    h1.message { font-family: 'Lora', Georgia, serif; font-size: clamp(1.1rem, 3.2vw, 1.5rem); font-weight: 400; font-style: italic; line-height: 1.75; color: var(--cream); letter-spacing: 0.01em; margin-bottom: 0.5rem; animation: fadeUp 1.4s 0.3s both ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .subtitle { font-family: 'Press Start 2P', monospace; font-size: 0.45rem; color: var(--lavender); letter-spacing: 0.15em; margin-bottom: 2.8rem; opacity: 0.7; animation: fadeUp 1.4s 0.5s both ease; }
+
+    .btn-pixel { font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: var(--bg); background: var(--pink); border: none; cursor: pointer; padding: 1rem 2rem; letter-spacing: 0.05em; line-height: 1.5; transition: transform 0.1s, filter 0.15s; animation: fadeUp 1.4s 0.7s both ease; box-shadow: 4px 0 0 0 #b0366b, 0 4px 0 0 #b0366b, 4px 4px 0 0 #b0366b, 8px 0 0 0 #7a1f46, 0 8px 0 0 #7a1f46, 8px 8px 0 0 #7a1f46; }
+    .btn-pixel:hover { filter: brightness(1.15); transform: translate(-2px, -2px); box-shadow: 6px 0 0 0 #b0366b, 0 6px 0 0 #b0366b, 6px 6px 0 0 #b0366b, 10px 0 0 0 #7a1f46, 0 10px 0 0 #7a1f46, 10px 10px 0 0 #7a1f46; }
+    .btn-pixel:active { transform: translate(4px, 4px); box-shadow: 2px 0 0 0 #b0366b, 0 2px 0 0 #b0366b, 2px 2px 0 0 #b0366b; }
+
+    .music-indicator { position: fixed; top: 1.2rem; right: 1.4rem; z-index: 50; font-family: 'Press Start 2P', monospace; font-size: 0.4rem; color: var(--lavender); opacity: 0; transition: opacity 0.8s; display: flex; align-items: center; gap: 0.5rem; }
+    .music-indicator.visible { opacity: 0.7; }
+    .music-bars { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
+    .music-bars span { display: block; width: 3px; background: var(--lavender); border-radius: 1px; animation: barBounce 0.8s ease-in-out infinite alternate; }
+    .music-bars span:nth-child(1) { height: 6px;  animation-delay: 0s; }
+    .music-bars span:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+    .music-bars span:nth-child(3) { height: 8px;  animation-delay: 0.3s; }
+    .music-bars span:nth-child(4) { height: 14px; animation-delay: 0.1s; }
+    @keyframes barBounce { from { transform: scaleY(0.3); } to { transform: scaleY(1); } }
+
+    #page2 .card::before, #page2 .card::after, #page2 .card .corner-bl, #page2 .card .corner-br { border-color: var(--lavender); }
+    #page2 .card .hline-top, #page2 .card .hline-bot { background: linear-gradient(90deg, transparent, var(--lavender), transparent); }
+    #page2 .bird-perch-line { background: linear-gradient(90deg, transparent, var(--lavender) 30%, var(--lavender) 70%, transparent); }
+    #page2 h1.message { font-size: clamp(1rem, 2.8vw, 1.35rem); margin-bottom: 1rem; }
+    .reach-text { font-family: 'Press Start 2P', monospace; font-size: 0.5rem; color: var(--lavender); letter-spacing: 0.1em; margin-bottom: 1.8rem; line-height: 2; opacity: 0.85; animation: fadeUp 0.8s 0.2s both ease; }
+    .btn-call { font-family: 'Press Start 2P', monospace; font-size: 0.6rem; color: var(--bg); background: var(--lavender); border: none; cursor: pointer; padding: 1rem 1.6rem; display: inline-flex; align-items: center; gap: 0.8rem; text-decoration: none; letter-spacing: 0.04em; transition: transform 0.1s, filter 0.15s; animation: fadeUp 0.8s 0.35s both ease; box-shadow: 4px 0 0 0 #7c3aed, 0 4px 0 0 #7c3aed, 4px 4px 0 0 #7c3aed, 8px 0 0 0 #4c1d95, 0 8px 0 0 #4c1d95, 8px 8px 0 0 #4c1d95; }
+    .btn-call:hover { filter: brightness(1.12); transform: translate(-2px, -2px); }
+    .btn-call:active { transform: translate(4px, 4px); box-shadow: 2px 0 0 0 #7c3aed, 0 2px 0 0 #7c3aed, 2px 2px 0 0 #7c3aed; }
+    .phone-icon { animation: ring 1.8s ease-in-out infinite; display: inline-block; }
+    @keyframes ring { 0%,100% { transform: rotate(0deg); } 10% { transform: rotate(-15deg); } 20% { transform: rotate(15deg); } 30% { transform: rotate(-10deg); } 40% { transform: rotate(10deg); } 50% { transform: rotate(0deg); } }
+
+    .glow-orb { position: absolute; width: 340px; height: 340px; border-radius: 50%; background: radial-gradient(circle, var(--pink-glow) 0%, transparent 70%); pointer-events: none; z-index: -1; animation: pulse 3s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.15); opacity: 0.9; } }
+
+    .scanlines { position: fixed; inset: 0; z-index: 5; pointer-events: none; background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px); }
+
+    .cats-layer { position: fixed; bottom: 0; left: 0; right: 0; height: 80px; z-index: 20; pointer-events: none; overflow: hidden; }
+    .pixel-cat { position: absolute; bottom: 12px; }
+    .cat1 { animation: walkRight 18s linear infinite; left: -80px; }
+    @keyframes walkRight { 0% { left: -80px; } 45% { left: calc(50% - 40px); } 55% { left: calc(50% - 40px); } 100% { left: calc(100% + 80px); } }
+    .cat2 { animation: walkLeft 22s linear infinite; animation-delay: -9s; right: -80px; transform: scaleX(-1); }
+    @keyframes walkLeft { 0% { right: -80px; } 100% { right: calc(100% + 80px); } }
+  </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="hearts-bg" id="heartsContainer"></div>
+<div class="scanlines"></div>
+
+<div class="music-indicator" id="musicIndicator">
+  <div class="music-bars"><span></span><span></span><span></span><span></span></div>
+  ♪ playing
+</div>
+
+<!--
+
+-->
+<audio id="bgMusic" loop preload="auto">
+  <source src="關淑怡梦幻翻唱《忘記他》 （原唱：鄧麗君）被媒体和曲作者黄霑高度评价的翻唱。 [1gJMeO8TN0M].mp3" type="audio/mpeg">
+</audio>
+
+<!-- PAGE 1 -->
+<div class="page" id="page1">
+  <div class="glow-orb"></div>
+  <div class="card-wrapper">
+    <div class="bird-wrap">
+      <canvas id="bird1" class="bird-canvas" width="18" height="22"></canvas>
+      <div class="bird-perch-line"></div>
+    </div>
+    <div class="card">
+      <div class="corner-bl"></div><div class="corner-br"></div>
+      <div class="hline-top"></div><div class="hline-bot"></div>
+      <div class="pixel-heart-icon">
+        <svg width="48" height="44" viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="1" y="0" width="2" height="1" fill="#ff6b9d"/>
+          <rect x="5" y="0" width="2" height="1" fill="#ff6b9d"/>
+          <rect x="0" y="1" width="4" height="1" fill="#ff6b9d"/>
+          <rect x="4" y="1" width="4" height="1" fill="#ff6b9d"/>
+          <rect x="0" y="2" width="9" height="2" fill="#ff6b9d"/>
+          <rect x="1" y="4" width="7" height="1" fill="#ff6b9d"/>
+          <rect x="2" y="5" width="5" height="1" fill="#ff6b9d"/>
+          <rect x="3" y="6" width="3" height="1" fill="#ff6b9d"/>
+          <rect x="4" y="7" width="1" height="1" fill="#ff6b9d"/>
+          <rect x="2" y="1" width="1" height="1" fill="#ffb3d1"/>
+          <rect x="1" y="2" width="1" height="1" fill="#ffb3d1"/>
+        </svg>
+      </div>
+      <h1 class="message">
+        "umarım sınavların iyi geçmiştir<br>
+        seni uzaktan sessizce destekledim."
+      </h1>
+      <p class="subtitle">her adımında yanındaydım &nbsp;♡</p>
+      <button class="btn-pixel" onclick="goToPage2()">▶ &nbsp; devam et</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page hidden" id="page2">
+  <div class="glow-orb" style="background:radial-gradient(circle,#c084fc55 0%,transparent 70%)"></div>
+  <div class="card-wrapper">
+    <div class="bird-wrap" id="bird2wrap" style="opacity:0;transition:opacity 0.7s 0.3s">
+      <canvas id="bird2" class="bird-canvas" width="18" height="22"></canvas>
+      <div class="bird-perch-line"></div>
+    </div>
+    <div class="card">
+      <div class="corner-bl"></div><div class="corner-br"></div>
+      <div class="hline-top"></div><div class="hline-bot"></div>
+      <div class="pixel-heart-icon">
+        <svg width="48" height="44" viewBox="0 0 12 11" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+          <rect x="1" y="0" width="2" height="1" fill="#c084fc"/>
+          <rect x="5" y="0" width="2" height="1" fill="#c084fc"/>
+          <rect x="0" y="1" width="4" height="1" fill="#c084fc"/>
+          <rect x="4" y="1" width="4" height="1" fill="#c084fc"/>
+          <rect x="0" y="2" width="9" height="2" fill="#c084fc"/>
+          <rect x="1" y="4" width="7" height="1" fill="#c084fc"/>
+          <rect x="2" y="5" width="5" height="1" fill="#c084fc"/>
+          <rect x="3" y="6" width="3" height="1" fill="#c084fc"/>
+          <rect x="4" y="7" width="1" height="1" fill="#c084fc"/>
+          <rect x="2" y="1" width="1" height="1" fill="#e5cbff"/>
+          <rect x="1" y="2" width="1" height="1" fill="#e5cbff"/>
+        </svg>
+      </div>
+      <h1 class="message">
+        "seni seviyorum ve değer veriyorum.<br>
+        her zaman seni destekleyeceğim."
+      </h1>
+      <p class="reach-text">istediğin zaman bana ulaşabilirsin</p>
+      <a class="btn-call" href="tel:YOUR_PHONE_NUMBER">
+        <span class="phone-icon">
+          <svg width="20" height="20" viewBox="0 0 8 8" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+            <rect x="1" y="0" width="3" height="1" fill="#0a0a12"/>
+            <rect x="0" y="1" width="1" height="3" fill="#0a0a12"/>
+            <rect x="1" y="1" width="2" height="2" fill="#0a0a12"/>
+            <rect x="3" y="1" width="1" height="4" fill="#0a0a12"/>
+            <rect x="4" y="4" width="3" height="1" fill="#0a0a12"/>
+            <rect x="5" y="5" width="2" height="2" fill="#0a0a12"/>
+            <rect x="4" y="7" width="3" height="1" fill="#0a0a12"/>
+            <rect x="7" y="4" width="1" height="3" fill="#0a0a12"/>
+          </svg>
+        </span>
+        ara beni
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="cats-layer">
+  <div class="pixel-cat cat1"><div id="cat1sprite"></div></div>
+  <div class="pixel-cat cat2"><div id="cat2sprite"></div></div>
+</div>
+
+<script>
+  // Stars
+  var starsEl = document.getElementById('stars');
+  for (var i = 0; i < 140; i++) {
+    var s = document.createElement('div'); s.className = 'star';
+    var sz = Math.random() * 2.5 + 0.5;
+    s.style.cssText = 'width:'+sz+'px;height:'+sz+'px;top:'+(Math.random()*100)+'%;left:'+(Math.random()*100)+'%;--d:'+(Math.random()*3+1.5).toFixed(1)+'s;animation-delay:'+(Math.random()*4).toFixed(1)+'s;';
+    starsEl.appendChild(s);
+  }
+
+  // Floating hearts
+  var HC = document.getElementById('heartsContainer');
+  function createHeart() {
+    var h = document.createElement('div'); h.className = 'pixel-heart-float';
+    var size = Math.random()*16+10;
+    var color = ['#ff6b9d','#c084fc','#f9a8d4','#e879f9'][Math.floor(Math.random()*4)];
+    h.innerHTML = '<svg width="'+size+'" height="'+size+'" viewBox="0 0 8 7" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="1" y="0" width="2" height="1" fill="'+color+'"/><rect x="5" y="0" width="2" height="1" fill="'+color+'"/><rect x="0" y="1" width="8" height="2" fill="'+color+'"/><rect x="1" y="3" width="6" height="1" fill="'+color+'"/><rect x="2" y="4" width="4" height="1" fill="'+color+'"/><rect x="3" y="5" width="2" height="1" fill="'+color+'"/><rect x="4" y="6" width="1" height="1" fill="'+color+'" opacity="0.5"/></svg>';
+    var dur = (Math.random()*8+7).toFixed(1);
+    h.style.cssText = 'left:'+(Math.random()*100)+'%;--dur:'+dur+'s;--delay:'+(Math.random()*10).toFixed(1)+'s;--drift:'+(Math.random()*120-60).toFixed(0)+'px;';
+    HC.appendChild(h);
+    setTimeout(function(){ h.remove(); }, (parseFloat(dur)+10)*1000);
+  }
+  for (var j=0;j<12;j++) setTimeout(createHeart, j*600);
+  setInterval(createHeart, 900);
+
+  // Music
+  var audio = document.getElementById('bgMusic');
+  var musicStarted = false;
+  var musicIndicator = document.getElementById('musicIndicator');
+  function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    audio.volume = 0.65;
+    audio.play().then(function() {
+      setTimeout(function(){ musicIndicator.classList.add('visible'); }, 800);
+    }).catch(function(){ musicStarted = false; });
+  }
+  document.addEventListener('click', startMusic, {once:true});
+  document.addEventListener('touchstart', startMusic, {once:true});
+
+  // Page transition
+  function goToPage2() {
+    startMusic();
+    document.getElementById('page1').classList.add('hidden');
+    setTimeout(function(){
+      document.getElementById('page2').classList.remove('hidden');
+      setTimeout(function(){ document.getElementById('bird2wrap').style.opacity='1'; }, 50);
+    }, 500);
+  }
+
+  // ──────────────────────────────────────────────
+  //  8-BIT BEE-EATER BIRD
+  //  European / Rainbow Bee-Eater
+  //  18px wide × 22px tall canvas, displayed at 90×110px
+  //  Bird faces LEFT. Long sharp beak at left, tail at right.
+  //
+  //  Palette:
+  //  0 = transparent
+  //  1 = teal body      #2bbfb0
+  //  2 = dark outline   #0d6860
+  //  3 = yellow throat  #f5d33a
+  //  4 = orange breast  #f07020
+  //  5 = black stripe   #151515
+  //  6 = rufous back    #a83020
+  //  7 = beak dark      #2a1505
+  //  8 = sky-blue tail  #5aaeee
+  //  9 = cream eye      #feebd0
+  // 10 = wing green     #1fa060
+  // ──────────────────────────────────────────────
+  var P = ['transparent','#2bbfb0','#0d6860','#f5d33a','#f07020','#151515','#a83020','#2a1505','#5aaeee','#feebd0','#1fa060'];
+
+  // Frame A — resting
+  var FA = [
+    [0,0,0,0,0,0,0,8,8,8,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,8,1,1,8,2,0,0,0,0,0,0,0],
+    [0,0,0,0,0,8,1,1,10,10,1,2,0,0,0,0,0,0],
+    [0,7,5,5,5,1,10,10,6,6,1,1,2,0,0,0,0,0],
+    [7,5,9,5,3,3,6,6,6,1,1,1,1,2,0,0,0,0],
+    [0,7,5,3,3,4,6,6,1,1,1,1,1,1,2,0,0,0],
+    [0,0,0,4,4,4,1,1,1,1,1,1,1,1,1,2,0,0],
+    [0,0,0,0,4,1,1,1,1,1,1,1,1,1,1,1,2,0],
+    [0,0,0,0,4,4,1,1,1,1,1,1,1,1,1,2,0,0],
+    [0,0,0,4,4,4,1,1,1,1,1,1,1,1,2,0,0,0],
+    [0,0,0,0,4,3,3,1,1,1,1,1,1,2,0,0,0,0],
+    [0,0,0,0,0,2,1,1,1,1,1,1,2,0,0,0,0,0],
+    [0,0,0,0,0,0,2,1,1,1,1,2,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,2,8,8,2,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,5,0,0,5,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  ];
+
+  // Frame B — head dips 1px (gentle idle bob)
+  var FB = [
+    [0,0,0,0,0,0,0,0,8,8,8,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,8,1,1,8,2,0,0,0,0,0,0],
+    [0,0,0,0,0,0,8,1,1,10,10,1,2,0,0,0,0,0],
+    [0,0,7,5,5,5,1,10,10,6,6,1,1,2,0,0,0,0],
+    [0,7,5,9,5,3,3,6,6,6,1,1,1,1,2,0,0,0],
+    [0,0,7,5,3,3,4,6,6,1,1,1,1,1,1,2,0,0],
+    [0,0,0,0,4,4,4,1,1,1,1,1,1,1,1,1,2,0],
+    [0,0,0,0,0,4,1,1,1,1,1,1,1,1,1,1,1,2],
+    [0,0,0,0,0,4,4,1,1,1,1,1,1,1,1,2,0,0],
+    [0,0,0,0,4,4,4,1,1,1,1,1,1,1,2,0,0,0],
+    [0,0,0,0,0,4,3,3,1,1,1,1,1,2,0,0,0,0],
+    [0,0,0,0,0,0,2,1,1,1,1,1,2,0,0,0,0,0],
+    [0,0,0,0,0,0,0,2,1,1,1,2,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,2,8,2,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,5,0,0,5,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  ];
+
+  function paintBird(canvas, frame) {
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,18,22);
+    for (var y=0;y<22;y++) for (var x=0;x<18;x++) {
+      var v = frame[y][x]; if (!v) continue;
+      ctx.fillStyle = P[v]; ctx.fillRect(x,y,1,1);
+    }
+  }
+
+  function setupBird(id) {
+    var cv = document.getElementById(id); if (!cv) return;
+    var f = 0; paintBird(cv, FA);
+    setInterval(function(){ f=f?0:1; paintBird(cv, f?FB:FA); }, 550);
+  }
+  setupBird('bird1');
+  setupBird('bird2');
+
+  // Cats
+  function drawCatFrame(cid, pal, fi) {
+    var cv = document.createElement('canvas'); cv.width=16; cv.height=16;
+    cv.style.width='64px'; cv.style.height='64px'; cv.style.imageRendering='pixelated';
+    document.getElementById(cid).appendChild(cv);
+    var ctx = cv.getContext('2d');
+    var cmap = ['transparent',pal[0],pal[1],pal[2],pal[3],pal[4]];
+    var grids = [
+      [[0,0,0,0,2,2,0,0,2,2,0,0,0,0,0,0],[0,0,0,2,1,1,2,2,1,1,2,0,0,0,0,0],[0,0,2,1,1,1,1,1,1,1,1,2,0,0,0,0],[0,2,1,1,5,1,2,2,1,5,1,1,2,0,0,0],[0,2,1,1,1,4,1,1,4,1,1,1,2,0,0,0],[0,2,1,3,1,1,1,1,1,1,3,1,2,0,0,0],[0,0,2,1,1,1,1,1,1,1,1,2,0,0,0,0],[0,0,0,2,1,1,1,1,1,1,2,0,0,0,0,0],[0,0,2,1,1,1,1,1,1,1,1,2,0,0,0,0],[0,2,1,1,2,1,1,1,1,2,1,1,2,0,0,0],[0,2,1,1,1,1,1,1,1,1,1,1,2,0,0,0],[0,2,1,1,1,1,1,1,1,1,1,1,2,0,0,0],[0,0,2,1,1,1,1,1,1,1,1,2,0,0,0,0],[0,0,2,1,2,0,2,2,0,2,1,2,0,0,0,0],[0,2,1,2,0,0,2,2,0,0,2,1,2,0,0,0],[0,2,2,0,0,0,2,2,0,0,0,2,2,0,0,0]],
+      [[0,0,0,0,2,2,0,0,2,2,0,0,0,0,0,0],[0,0,0,2,1,1,2,2,1,1,2,0,0,0,0,0],[0,0,2,1,1,1,1,1,1,1,1,2,0,0,0,0],[0,2,1,1,5,1,2,2,1,5,1,1,2,0,0,0],[0,2,1,1,1,4,1,1,4,1,1,1,2,0,0,0],[0,2,1,3,1,1,1,1,1,1,3,1,2,0,0,0],[0,0,2,1,1,1,1,1,1,1,1,2,0,0,0,0],[0,0,0,2,1,1,1,1,1,1,2,0,0,0,0,0],[0,0,2,1,1,1,1,1,1,1,1,2,0,0,0,0],[0,2,1,1,2,1,1,1,1,2,1,1,2,0,0,0],[0,2,1,1,1,1,1,1,1,1,1,1,2,0,0,0],[0,2,1,1,1,1,1,1,1,1,1,1,2,0,0,0],[0,0,2,1,1,1,1,1,1,1,1,2,0,0,0,0],[0,0,2,2,0,2,1,1,2,0,2,2,0,0,0,0],[0,0,0,0,2,1,2,2,1,2,0,0,0,0,0,0],[0,0,0,0,2,2,0,0,2,2,0,0,0,0,0,0]]
+    ];
+    ctx.clearRect(0,0,16,16);
+    var g=grids[fi];
+    for (var y=0;y<16;y++) for (var x=0;x<16;x++) { var c=g[y][x]; if(!c) continue; ctx.fillStyle=cmap[c]; ctx.fillRect(x,y,1,1); }
+    return cv;
+  }
+  function setupCat(cid, pal) {
+    var fA=drawCatFrame(cid,pal,0), fB=drawCatFrame(cid,pal,1); fB.style.display='none'; var cur=0;
+    setInterval(function(){ if(cur===0){fA.style.display='none';fB.style.display='block';cur=1;}else{fB.style.display='none';fA.style.display='block';cur=0;} },220);
+  }
+  setupCat('cat1sprite',['#c4854a','#7a4a1e','#e8b87a','#ff9999','#1a1a2e']);
+  setupCat('cat2sprite',['#8b5e3c','#4a2c10','#c49060','#ff9999','#1a1a2e']);
+</script>
+</body>
+</html>
